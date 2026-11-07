@@ -185,11 +185,11 @@ impl Query {
         let total_size = ids.iter().map(|&i| tree.nodes[i as usize].size).sum();
         let node = |i: &NodeId| &tree.nodes[*i as usize];
         match self.sort {
-            SortBy::SizeDesc => ids.sort_by(|a, b| node(b).size.cmp(&node(a).size)),
-            SortBy::SizeAsc => ids.sort_by(|a, b| node(a).size.cmp(&node(b).size)),
-            SortBy::Newest => ids.sort_by(|a, b| node(b).mtime.cmp(&node(a).mtime)),
-            SortBy::Oldest => ids.sort_by(|a, b| node(a).mtime.cmp(&node(b).mtime)),
-            SortBy::Name => ids.sort_by(|a, b| node(a).name.to_lowercase().cmp(&node(b).name.to_lowercase())),
+            SortBy::SizeDesc => ids.sort_by_key(|i| std::cmp::Reverse(node(i).size)),
+            SortBy::SizeAsc => ids.sort_by_key(|a| node(a).size),
+            SortBy::Newest => ids.sort_by_key(|i| std::cmp::Reverse(node(i).mtime)),
+            SortBy::Oldest => ids.sort_by_key(|a| node(a).mtime),
+            SortBy::Name => ids.sort_by_key(|a| node(a).name.to_lowercase()),
         }
         let limit = if self.limit == 0 { 500 } else { self.limit };
         let hits = ids

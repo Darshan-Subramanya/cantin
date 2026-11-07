@@ -56,7 +56,7 @@ enum Cmd {
     },
 }
 
-fn run_scan(path: &PathBuf, opts: ScanOptions, quiet: bool) -> Tree {
+fn run_scan(path: &std::path::Path, opts: ScanOptions, quiet: bool) -> Tree {
     let progress = Arc::new(ScanProgress::new());
     let p2 = progress.clone();
     let done = Arc::new(std::sync::atomic::AtomicBool::new(false));

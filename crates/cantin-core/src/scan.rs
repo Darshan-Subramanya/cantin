@@ -383,7 +383,7 @@ fn flatten(root: Raw) -> (Vec<Node>, Vec<CategoryTotal>) {
         }
     }
 
-    cat_totals.sort_by(|a, b| b.size.cmp(&a.size));
+    cat_totals.sort_by_key(|c| std::cmp::Reverse(c.size));
     (nodes, cat_totals)
 }
 

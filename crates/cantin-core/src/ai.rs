@@ -452,6 +452,79 @@ mod tests {
         assert!(system_prompt("2026-01-01").contains("2026-01-01"));
     }
 
+    /// Minimal one-shot HTTP server that records the request and replies with `body`.
+    #[cfg(feature = "ai-http")]
+    fn fake_server(body: String) -> (String, std::thread::JoinHandle<String>) {
+        use std::io::{Read, Write};
+        let l = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let url = format!("http://{}", l.local_addr().unwrap());
+        let h = std::thread::spawn(move || {
+            let (mut s, _) = l.accept().unwrap();
+            let mut buf = Vec::new();
+            let mut chunk = [0u8; 4096];
+            loop {
+                let n = s.read(&mut chunk).unwrap();
+                buf.extend_from_slice(&chunk[..n]);
+                let text = String::from_utf8_lossy(&buf);
+                if let Some(i) = text.find("\r\n\r\n") {
+                    let len = text[..i]
+                        .lines()
+                        .find_map(|l| l.to_ascii_lowercase().strip_prefix("content-length:").map(|v| v.trim().parse::<usize>().unwrap()))
+                        .unwrap_or(0);
+                    if buf.len() >= i + 4 + len {
+                        break;
+                    }
+                }
+                if n == 0 {
+                    break;
+                }
+            }
+            write!(s, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", body.len(), body).unwrap();
+            String::from_utf8_lossy(&buf).into_owned()
+        });
+        (url, h)
+    }
+
+    #[cfg(feature = "ai-http")]
+    #[test]
+    fn ollama_backend_roundtrip() {
+        let content = r#"{"categories":["video"],"extensions":[],"min_size":"1GB"}"#;
+        let (url, h) = fake_server(json!({"message": {"role": "assistant", "content": content}}).to_string());
+        let q = translate(&Backend::Ollama { url, model: "qwen2.5:3b".into() }, "big videos").unwrap();
+        assert_eq!(q.categories, vec![Category::Video]);
+        assert_eq!(q.min_size, Some(1 << 30));
+        let req = h.join().unwrap();
+        assert!(req.starts_with("POST /api/chat"));
+        assert!(req.contains("\"format\":{"), "must send JSON schema for constrained output");
+        assert!(req.contains("\"stream\":false") && req.contains("big videos"));
+    }
+
+    #[cfg(feature = "ai-http")]
+    #[test]
+    fn openai_compatible_backend_roundtrip() {
+        let content = r#"{"categories":[],"extensions":["pdf"],"path_contains":"Downloads"}"#;
+        let (url, h) = fake_server(json!({"choices": [{"message": {"content": content}}]}).to_string());
+        let q = translate(&Backend::OpenaiCompatible { url, model: "local".into() }, "pdfs in downloads").unwrap();
+        assert_eq!(q.extensions, vec!["pdf"]);
+        assert_eq!(q.path_contains.as_deref(), Some("Downloads"));
+        let req = h.join().unwrap();
+        assert!(req.starts_with("POST /v1/chat/completions"));
+        assert!(req.contains("\"json_schema\""));
+    }
+
+    #[cfg(feature = "ai-http")]
+    #[test]
+    fn list_models_and_unreachable() {
+        let (url, h) = fake_server(json!({"models": [{"name": "qwen2.5:3b"}, {"name": "llama3.2:3b"}]}).to_string());
+        let m = list_models(&Backend::Ollama { url, model: String::new() }).unwrap();
+        assert_eq!(m, vec!["qwen2.5:3b", "llama3.2:3b"]);
+        assert!(h.join().unwrap().starts_with("GET /api/tags"));
+
+        // nothing listening on port 9 (discard) → a clear, non-panicking error
+        let err = translate(&Backend::Ollama { url: "http://127.0.0.1:9".into(), model: "x".into() }, "hi").unwrap_err();
+        assert!(matches!(err, AiError::Unreachable(..)), "{err}");
+    }
+
     /// Golden set for the rule-based translator. The same prompts are used to
     /// evaluate LLM backends (see `cantin ask --eval`).
     #[test]

@@ -88,7 +88,7 @@ pub fn find_duplicates(tree: &Tree, opts: &DupOptions, progress: &JobProgress) -
         })
         .collect();
 
-    groups.sort_by(|a, b| b.wasted.cmp(&a.wasted));
+    groups.sort_by_key(|g| std::cmp::Reverse(g.wasted));
     groups
 }
 
