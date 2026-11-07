@@ -1,0 +1,26 @@
+[package]
+name = "cantin-core"
+description = "Scanning, analysis and search engine for the Cantin storage analyzer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[features]
+default = ["ai-http"]
+# HTTP client for local LLM servers (Ollama / llama.cpp server / LM Studio)
+ai-http = ["dep:ureq"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+rayon = "1.10"
+regex = "1.11"
+globset = "0.4"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+blake3 = "1.5"
+thiserror = "2"
+dunce = "1.0"
+ureq = { version = "2.12", features = ["json"], optional = true }
+
+[dev-dependencies]
+tempfile = "3"
