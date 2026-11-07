@@ -1,8 +1,11 @@
 name: Release
 
-# Push a tag like v0.1.0 to build installers for every OS and create a draft GitHub release.
+# Builds installers for every OS into a draft GitHub release named after the
+# app version in src-tauri/tauri.conf.json (e.g. v0.1.0).
+# Trigger: push to the `release` branch, push a `v*` tag, or run manually.
 on:
   push:
+    branches: [release]
     tags: ["v*"]
   workflow_dispatch:
 
@@ -46,8 +49,8 @@ jobs:
           # Code signing (optional, add later):
           # APPLE_CERTIFICATE / APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID for macOS notarization
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Cantin ${{ github.ref_name }}"
+          tagName: v__VERSION__
+          releaseName: "Cantin v__VERSION__"
           releaseBody: "See the assets below to download Cantin for your OS."
           releaseDraft: true
           prerelease: false
