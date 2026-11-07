@@ -201,7 +201,7 @@ function StatusBar() {
   const stats = useStore((s) => s.stats);
   const phase = useStore((s) => s.phase);
   if (!stats || phase !== "ready") {
-    return <footer className="statusbar"><span>Ready</span><span style={{ marginLeft: "auto" }}>Cantin 0.1.0 · open source</span></footer>;
+    return <footer className="statusbar"><span>Ready</span><span style={{ marginLeft: "auto" }}>Cantin 0.1.1 · open source</span></footer>;
   }
   return (
     <footer className="statusbar">

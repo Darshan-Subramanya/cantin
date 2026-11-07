@@ -464,7 +464,7 @@ dependencies = [
 
 [[package]]
 name = "cantin"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cantin-core",
  "dirs 6.0.0",
@@ -479,7 +479,7 @@ dependencies = [
 
 [[package]]
 name = "cantin-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cantin-core",
  "clap",
@@ -489,7 +489,7 @@ dependencies = [
 
 [[package]]
 name = "cantin-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "blake3",
  "dunce",

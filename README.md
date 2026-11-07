@@ -81,6 +81,29 @@ sudo dnf install ./Cantin-*.x86_64.rpm
 
 Your home folder needs no special permissions. To scan system folders such as `/var` or `/`, start Cantin with `sudo`, or accept that unreadable folders are marked 🔒 and skipped.
 
+### Command-line tool (optional)
+
+The `cantin` terminal command is a separate small download. You don't need Rust.
+
+**macOS / Linux:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/Darshan-Subramanya/cantin/main/scripts/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Darshan-Subramanya/cantin/main/scripts/install.ps1 | iex
+```
+
+You can also download `cantin-<target>.tar.gz` (or `.zip` on Windows) from the release and put the `cantin` file anywhere on your PATH.
+
+```bash
+cantin scan ~                                    # largest folders, files, categories
+cantin dupes ~/Pictures --min-size 1MB           # duplicate files
+cantin ask ~ "pdfs in Downloads older than 2022" # smart search
+cantin scan / --json                             # machine-readable output
+```
+
 ## Screenshots
 
 | | |
@@ -102,6 +125,8 @@ Type a request in the search box with **✦ Smart** turned on. Cantin turns it i
 If the model can't be reached, Cantin uses the built-in rules and tells you.
 
 ## Build from source
+
+> You only need Rust and Node to **build** Cantin yourself. Using the app or the CLI needs neither.
 
 **1. Install the prerequisites:**
 
@@ -135,15 +160,7 @@ npm run tauri build
 cargo test -p cantin-core
 ```
 
-### Command-line tool
-
-The same engine is also available as a CLI:
-
-```bash
-cargo run --release -p cantin-cli -- scan ~               # largest folders, files, categories
-cargo run --release -p cantin-cli -- dupes ~/Pictures --min-size 1MB
-cargo run --release -p cantin-cli -- ask ~ "pdfs in Downloads older than 2022"
-```
+To install the CLI from source: `cargo install --git https://github.com/Darshan-Subramanya/cantin cantin-cli`.
 
 ### Project layout
 

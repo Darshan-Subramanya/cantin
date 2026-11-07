@@ -55,3 +55,48 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+  # Prebuilt `cantin` command-line tool, attached to the same draft release.
+  cli:
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: cli-${{ matrix.target }}
+      - name: Build
+        run: cargo build --release --locked -p cantin-cli --target ${{ matrix.target }}
+      - name: Package and upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(jq -r .version src-tauri/tauri.conf.json)
+          DIR=target/${{ matrix.target }}/release
+          NAME=cantin-${{ matrix.target }}
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            7z a "$NAME.zip" "./$DIR/cantin.exe"
+            FILE="$NAME.zip"
+          else
+            tar -C "$DIR" -czf "$NAME.tar.gz" cantin
+            FILE="$NAME.tar.gz"
+          fi
+          gh release upload "v$VERSION" "$FILE" --clobber --repo "$GITHUB_REPOSITORY"
