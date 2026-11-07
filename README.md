@@ -38,9 +38,9 @@ Download the installer for your system from the
 | macOS, Apple Silicon (M1–M4) | `Cantin_<version>_aarch64.dmg` |
 | macOS, Intel | `Cantin_<version>_x64.dmg` |
 | Windows 10/11 | `Cantin_<version>_x64-setup.exe` or `Cantin_<version>_x64_en-US.msi` |
-| Linux, any distro | `cantin_<version>_amd64.AppImage` |
-| Debian, Ubuntu, Mint | `cantin_<version>_amd64.deb` |
-| Fedora, RHEL, openSUSE | `cantin-<version>-1.x86_64.rpm` |
+| Linux, any distro | `Cantin_<version>_amd64.AppImage` |
+| Debian, Ubuntu, Mint | `Cantin_<version>_amd64.deb` |
+| Fedora, RHEL, openSUSE | `Cantin-<version>-1.x86_64.rpm` |
 
 > Cantin is not code-signed yet, so your OS will warn you the first time you open it. Each section below shows how to get past the warning.
 
@@ -65,18 +65,18 @@ Cantin uses the Microsoft Edge WebView2 runtime. It's built into Windows 11, and
 
 **AppImage (any distro):**
 ```bash
-chmod +x cantin_*_amd64.AppImage
-./cantin_*_amd64.AppImage
+chmod +x Cantin_*_amd64.AppImage
+./Cantin_*_amd64.AppImage
 ```
 
 **Debian / Ubuntu:**
 ```bash
-sudo apt install ./cantin_*_amd64.deb
+sudo apt install ./Cantin_*_amd64.deb
 ```
 
 **Fedora / RHEL:**
 ```bash
-sudo dnf install ./cantin-*.x86_64.rpm
+sudo dnf install ./Cantin-*.x86_64.rpm
 ```
 
 Your home folder needs no special permissions. To scan system folders such as `/var` or `/`, start Cantin with `sudo`, or accept that unreadable folders are marked 🔒 and skipped.
