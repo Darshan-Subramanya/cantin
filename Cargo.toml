@@ -6,7 +6,7 @@ members = ["crates/cantin-core", "crates/cantin-cli", "src-tauri"]
 version = "0.1.0"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/cantin-app/cantin"
+repository = "https://github.com/Darshan-Subramanya/cantin"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

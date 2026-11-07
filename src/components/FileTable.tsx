@@ -23,12 +23,11 @@ export function FileTable({ rows, total }: { rows: FileRow[]; total?: number }) 
     <table className="list">
       <thead>
         <tr>
-          <th>Name</th>
+          <th style={{ width: "30%" }}>Name</th>
           <th>Location</th>
-          <th style={{ width: 130 }}>Type</th>
-          <th className="num" style={{ width: 90 }}>Modified</th>
-          <th className="num" style={{ width: 150 }}>Size</th>
-          <th style={{ width: 170 }} />
+          <th style={{ width: 140 }}>Type</th>
+          <th className="num" style={{ width: 106 }}>Modified</th>
+          <th className="num" style={{ width: 130 }}>Size</th>
         </tr>
       </thead>
       <tbody>
@@ -41,10 +40,16 @@ export function FileTable({ rows, total }: { rows: FileRow[]; total?: number }) 
                 <span className="ellipsis selectable" title={r.name}>{r.name}</span>
               </div>
             </td>
-            <td className="muted mono ellipsis-start" style={{ maxWidth: 320 }} title={r.path}><bdi>{dirName(r.path)}</bdi></td>
+            <td className="loc" title={r.path}>
+              <div className="muted mono ellipsis-start loc-text"><bdi>{dirName(r.path)}</bdi></div>
+              <div className="row-actions">
+                <button className="small" onClick={(e) => { e.stopPropagation(); reveal(r.path); }}>{revealLabel}</button>
+                <button className="small" onClick={(e) => { e.stopPropagation(); copyPath(r.path); }}>Copy path</button>
+              </div>
+            </td>
             <td className="muted">
               {r.kind === "dir" ? "Folder" : (
-                <span className="row" style={{ gap: 0 }}><span className="dot" style={{ background: CATEGORY_COLOR[r.category] }} />{CATEGORY_LABEL[r.category]}</span>
+                <span className="row ellipsis" style={{ gap: 0 }}><span className="dot" style={{ background: CATEGORY_COLOR[r.category] }} />{CATEGORY_LABEL[r.category]}</span>
               )}
             </td>
             <td className="num muted">{formatDate(r.mtime)}</td>
@@ -54,17 +59,11 @@ export function FileTable({ rows, total }: { rows: FileRow[]; total?: number }) 
                 {formatSize(r.size)}
               </div>
             </td>
-            <td>
-              <div className="row-actions">
-                <button className="small" onClick={(e) => { e.stopPropagation(); reveal(r.path); }}>{revealLabel}</button>
-                <button className="small" onClick={(e) => { e.stopPropagation(); copyPath(r.path); }}>Copy path</button>
-              </div>
-            </td>
           </tr>
         ))}
       </tbody>
       {total !== undefined && total > rows.length && (
-        <tfoot><tr><td colSpan={6} className="muted" style={{ textAlign: "center" }}>Showing {rows.length} of {total.toLocaleString()}</td></tr></tfoot>
+        <tfoot><tr><td colSpan={5} className="muted" style={{ textAlign: "center" }}>Showing {rows.length} of {total.toLocaleString()}</td></tr></tfoot>
       )}
     </table>
   );

@@ -168,7 +168,7 @@ input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px v
 .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
 
 /* ---------- tables ---------- */
-table.list { width: 100%; border-collapse: collapse; }
+table.list { width: 100%; border-collapse: collapse; table-layout: fixed; }
 table.list th {
   position: sticky; top: 0; background: var(--panel); text-align: left; font-weight: 500;
   color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px;
@@ -177,8 +177,10 @@ table.list th {
 table.list td { padding: 5px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 table.list tr:hover td { background: var(--row-hover); }
 table.list tr.sel td { background: var(--row-sel); }
-.row-actions { visibility: hidden; display: flex; gap: 4px; justify-content: flex-end; }
-tr:hover .row-actions { visibility: visible; }
+td.loc { position: relative; }
+.row-actions { display: none; gap: 4px; position: absolute; inset: 0; align-items: center; padding: 0 10px; background: var(--row-hover); }
+tr:hover .row-actions { display: flex; }
+table.list td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 6px; flex: none; }
 
 /* ---------- cards / welcome ---------- */
