@@ -132,7 +132,12 @@ pub fn scan(root: &Path, opts: &ScanOptions, progress: &ScanProgress) -> Result<
 }
 
 fn build_skip_list(root: &Path, opts: &ScanOptions) -> Vec<PathBuf> {
-    let mut v: Vec<PathBuf> = opts.exclude.clone();
+    // Normalise like the root (dunce: no \\?\ prefix on Windows) so comparisons match.
+    let mut v: Vec<PathBuf> = opts
+        .exclude
+        .iter()
+        .map(|p| dunce::canonicalize(p).unwrap_or_else(|_| p.clone()))
+        .collect();
     if opts.skip_pseudo && cfg!(target_os = "linux") {
         for p in ["/proc", "/sys", "/dev", "/run/user"] {
             v.push(PathBuf::from(p));
@@ -500,7 +505,7 @@ mod tests {
         assert!(kids.windows(2).all(|w| w[0].size >= w[1].size));
         assert_eq!(&*kids[0].name, "a");
         // path reconstruction + lookup
-        let id = tree.find_path(&t.path().canonicalize().unwrap().join("a/b/small.txt")).unwrap();
+        let id = tree.find_path(&dunce::canonicalize(t.path()).unwrap().join("a/b/small.txt")).unwrap();
         assert_eq!(tree.path(id).file_name().unwrap(), "small.txt");
         // categories
         let nm = tree.find_path(&tree.root_path.join("node_modules/pkg/index.js")).unwrap();
@@ -545,7 +550,7 @@ mod tests {
     #[test]
     fn excludes_and_cancel() {
         let t = fixture();
-        let root = t.path().canonicalize().unwrap();
+        let root = dunce::canonicalize(t.path()).unwrap();
         let opts = ScanOptions {
             exclude: vec![root.join("a")],
             ..Default::default()
